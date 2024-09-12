@@ -11,6 +11,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.example.BearToken.BearTocken.getIdToken;
 
@@ -45,14 +47,7 @@ class ExcelHandler {
         if (cell == null) return "";
 
         return switch (cell.getCellType()) {
-            case STRING -> {
-                String string_value =cell.getStringCellValue();  // Если тип ячейки строка, возвращаем строковое значение
-                if (string_value.equals("Ежедневно")){
-                    yield "ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС";
-                }
-                else yield string_value;
-
-            }
+            case STRING -> ScheduleProcessor.processSchedule(cell.getStringCellValue());
             case NUMERIC -> {
                 double numericValue = cell.getNumericCellValue();
                 // Проверяем, является ли число целым
@@ -159,3 +154,37 @@ class GraphQLVariables {
         this.request = request;
     }
 }
+
+
+ class ScheduleProcessor {
+
+     public static String processSchedule(String input) {
+         // Паттерны для обработки чисел с текстом и других вариантов, например, "Ежедневно"
+         Pattern pattern1 = Pattern.compile("(\\d+)(?:\\s*,\\s*)*(\\d+)?\\s*([А-Яа-я]+)");
+         Pattern pattern2 = Pattern.compile("\\b(ежедневно|Ежедневно)\\b");
+
+         // Обработка чисел с текстом (например, 1 , 3 СБ)
+         Matcher matcher1 = pattern1.matcher(input);
+         if (matcher1.find()) {
+             String label = matcher1.group(3);  // Извлекаем текст (например, СБ)
+             String[] numbers = matcher1.group(0).split("\\s*,\\s*");  // Извлекаем числа
+
+             // Строим результат, добавляя текст к каждому числу
+             StringBuilder result = new StringBuilder();
+             for (String number : numbers) {
+                 result.append(number.split("\\s")[0]).append("-").append(label).append(",");
+             }
+             result.setLength(result.length() - 1);  // Убираем последнюю запятую
+             return result.toString();
+         }
+
+         // Обработка "Ежедневно" или "ежедневно"
+         Matcher matcher2 = pattern2.matcher(input);
+         if (matcher2.find()) {
+             return "ПН,ВС,СР,ЧТ,ПТ,СБ,ВС";  // Обработка строки с ежедневным графиком
+         }
+
+         return input;  // Если не совпало ни с одним паттерном, возвращаем исходную строку
+     }
+}
+
