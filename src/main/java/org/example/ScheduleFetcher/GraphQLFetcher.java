@@ -161,7 +161,6 @@ class GraphQLVariables {
      public static String processSchedule(String input) {
          // Паттерны для обработки чисел с текстом и других вариантов, например, "Ежедневно"
          Pattern pattern1 = Pattern.compile("(\\d+)(?:\\s*,\\s*)*(\\d+)?\\s*([А-Яа-я]+)");
-         Pattern pattern2 = Pattern.compile("\\b(ежедневно|Ежедневно)\\b");
 
          // Обработка чисел с текстом (например, 1 , 3 СБ)
          Matcher matcher1 = pattern1.matcher(input);
@@ -179,12 +178,13 @@ class GraphQLVariables {
          }
 
          // Обработка "Ежедневно" или "ежедневно"
-         Matcher matcher2 = pattern2.matcher(input);
-         if (matcher2.find()) {
+
+         if (input.equals("Ежедневно")|| input.equals("ежедневно")) {
              return "ПН,ВС,СР,ЧТ,ПТ,СБ,ВС";  // Обработка строки с ежедневным графиком
          }
 
          return input;  // Если не совпало ни с одним паттерном, возвращаем исходную строку
      }
+
 }
 
