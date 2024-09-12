@@ -52,9 +52,11 @@ class ExcelHandler {
                 double numericValue = cell.getNumericCellValue();
                 // Проверяем, является ли число целым
                 if (numericValue == (long) numericValue) {
-                    yield String.valueOf((long) numericValue);  // Преобразуем в строку без дробной части
+                    String string = String.valueOf((long) numericValue);
+                    yield ScheduleProcessor.processSchedule(string);  // Преобразуем в строку без дробной части
                 } else {
-                    yield String.valueOf(numericValue);  // Преобразуем в строку с дробной частью
+                    String string = String.valueOf((long) numericValue);
+                    yield ScheduleProcessor.processSchedule(string);// Преобразуем в строку с дробной частью
                 }
             }
             default -> "";  // Для всех других типов возвращаем пустую строку
