@@ -45,7 +45,14 @@ class ExcelHandler {
         if (cell == null) return "";
 
         return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();  // Если тип ячейки строка, возвращаем строковое значение
+            case STRING -> {
+                String string_value =cell.getStringCellValue();  // Если тип ячейки строка, возвращаем строковое значение
+                if (string_value.equals("Ежедневно")){
+                    yield "ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС";
+                }
+                else yield string_value;
+
+            }
             case NUMERIC -> {
                 double numericValue = cell.getNumericCellValue();
                 // Проверяем, является ли число целым
