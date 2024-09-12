@@ -43,9 +43,19 @@ class ExcelHandler {
 
     public static String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
+
         return switch (cell.getCellType()) {
-            case STRING, NUMERIC -> cell.getStringCellValue();
-            default -> "";
+            case STRING -> cell.getStringCellValue();  // Если тип ячейки строка, возвращаем строковое значение
+            case NUMERIC -> {
+                double numericValue = cell.getNumericCellValue();
+                // Проверяем, является ли число целым
+                if (numericValue == (long) numericValue) {
+                    yield String.valueOf((long) numericValue);  // Преобразуем в строку без дробной части
+                } else {
+                    yield String.valueOf(numericValue);  // Преобразуем в строку с дробной частью
+                }
+            }
+            default -> "";  // Для всех других типов возвращаем пустую строку
         };
     }
 }
