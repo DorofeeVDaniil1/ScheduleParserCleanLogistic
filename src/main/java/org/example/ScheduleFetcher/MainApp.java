@@ -42,7 +42,7 @@ public class MainApp {
 
                 boolean isError = Objects.equals(id, PO_ZAYAVKE) && !Objects.equals(schedule.toLowerCase(), "по заявке");
                 DataWriter.writeDataToSheet(workbook, lk_code, isError ? schedule : id, volume, amount, isError, latitude, longitude);
-                System.out.println(lk_code+"$"+id);
+                System.out.println(lk_code+"$"+id+"%"+schedule);
 
             }
 
