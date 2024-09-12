@@ -159,8 +159,9 @@ class GraphQLVariables {
  class ScheduleProcessor {
 
      public static String processSchedule(String input) {
+         input = replaceDays(input);
          // Паттерны для обработки чисел с текстом и других вариантов, например, "Ежедневно"
-         Pattern pattern1 = Pattern.compile("(\\d+)(?:\\s*,\\s*)*(\\d+)?\\s*([А-Яа-я]+)");
+         Pattern pattern1 = Pattern.compile("\\d+,\\s*\\d+\\s+[А-Я]{2}");
 
          // Обработка чисел с текстом (например, 1 , 3 СБ)
          Matcher matcher1 = pattern1.matcher(input);
@@ -177,14 +178,78 @@ class GraphQLVariables {
              return result.toString();
          }
 
-         // Обработка "Ежедневно" или "ежедневно"
+         return input;
 
-         if (input.equals("Ежедневно")|| input.equals("ежедневно")) {
-             return "ПН,ВС,СР,ЧТ,ПТ,СБ,ВС";  // Обработка строки с ежедневным графиком
-         }
-
-         return input;  // Если не совпало ни с одним паттерном, возвращаем исходную строку
      }
 
+     public static String replaceDays(String input) {
+         // Массив для замены дней недели на аббревиатуры
+         String[][] dayMap = {
+                 {"понедельник", "ПН"},
+                 {"вторник", "ВТ"},
+                 {"среда", "СР"},
+                 {"четверг", "ЧТ"},
+                 {"пятница", "ПТ"},
+                 {"суббота", "СБ"},
+                 {"воскресенье", "ВС"},
+                 {"Ежедневно","ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС"},
+                 {"ежедневно","ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС"},
+                 {"число",""}
+         };
+
+         // Проходим по каждому дню недели и заменяем его аббревиатурой
+         for (String[] day : dayMap) {
+             String fullDay = day[0];   // Полное название дня
+             String abbreviation = day[1];  // Аббревиатура
+
+             // Заменяем все вхождения дня недели (без учета регистра), включая символы перед/после слова
+             input = input.replaceAll("(?i)" + fullDay, abbreviation);
+         }
+
+         return input;
+     }
+
+
 }
+
+
+ class TextProcessor {
+
+    // Метод для выделения строк с двумя числами и двухбуквенным словом
+    public static String extractValidPatterns(String input) {
+        // Паттерн для поиска двух чисел и двухбуквенного слова
+        Pattern pattern = Pattern.compile("\\b(\\d+)\\s*,\\s*(\\d+)\\s+([А-Яа-я]{2})\\b");
+        Matcher matcher = pattern.matcher(input);
+
+        // Замена всех совпадений
+        StringBuffer result = new StringBuffer();
+        while (matcher.find()) {
+            // Получаем найденные группы
+            String number1 = matcher.group(1);
+            String number2 = matcher.group(2);
+            String text = matcher.group(3);
+
+            // Формируем заменённую строку
+            matcher.appendReplacement(result, number1 + " , " + number2 + " " + text);
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        String input1 = "1 , 3 ВС и 1,4 число, а также 2 , 3 Вт и 1-число";
+        String input2 = "1 , 3 Пятница и 1 , 4 число, 12 , 34 ЧС";
+        String input3 = "1 число, 3 , 4 СБ и 5 , 6 ЧТ";
+
+        String result1 = extractValidPatterns(input1);
+        String result2 = extractValidPatterns(input2);
+        String result3 = extractValidPatterns(input3);
+
+        System.out.println("Результат 1: " + result1);  // Ожидаемый вывод: "1 , 3 ВС и 1,4 число, а также 2 , 3 Вт и 1-число"
+        System.out.println("Результат 2: " + result2);  // Ожидаемый вывод: "1 , 3 Вт и 1 , 4 число, 12 , 34 ЧС"
+        System.out.println("Результат 3: " + result3);  // Ожидаемый вывод: "1 , 2 ПТ, 3 , 4 СБ и 5 , 6 ЧТ"
+    }
+}
+
 
