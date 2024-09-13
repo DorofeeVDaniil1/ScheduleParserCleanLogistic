@@ -1,16 +1,31 @@
 package org.example.Configuration;
 
 public class Config {
+
+    private String domain;
+    private String USERNAME ;
+    //Пароль для авторизации
+    private String PASSWORD ;
+    private  String PO_ZAYAVKE;
+
+    public Config(String domain, String USERNAME, String PASSWORD, String PO_ZAYAVKE) {
+        this.domain = domain;
+        this.USERNAME = USERNAME;
+        this.PASSWORD = PASSWORD;
+        this.PO_ZAYAVKE = PO_ZAYAVKE;
+    }
+
     public String getPO_ZAYAVKE() {
         return PO_ZAYAVKE;
     }
-
+    //API для авторизации
     public String getURL() {
-        return URL;
+        return "https://"+ domain+ "/app/graphql";
     }
 
     public String getAUTH_URL() {
-        return AUTH_URL;
+        String string = "https://" + domain + "/app/api/v1/authenticate";
+        return string;
     }
 
     public String getUSERNAME() {
@@ -21,13 +36,7 @@ public class Config {
         return PASSWORD;
     }
 
-    private  final String URL = "https://PASTE_YOUR_DOMAIN/app/graphql";
-    private  final String AUTH_URL = "https://PASTE_YOUR_DOMAIN/app/api/v1/authenticate";
-    private  final String USERNAME = "LOGIN";
-    private  final String PASSWORD = "PASSWORD";
-
-    //ID расписания (по заявке)
-    private  final String PO_ZAYAVKE = "0f7490b1-0062-408f-b430-ea92580c451f";
+    //Домен для GRAPHQL
 
 
 

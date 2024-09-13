@@ -13,9 +13,7 @@ import java.net.http.HttpResponse;
 
 public class BearTocken {
 
-    public static String getIdToken() {
-        //Создать класс Config с полями
-        Config config = new Config();
+    public static String getIdToken(Config config) {
         //Получаем необходимые данные
         String USERNAME = config.getUSERNAME();
         String PASSWORD = config.getPASSWORD();

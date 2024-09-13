@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.example.Configuration.Config;
 
 import java.io.*;
 import java.net.URI;
@@ -18,15 +19,14 @@ import static org.example.BearToken.BearTocken.getIdToken;
 
 // Class to handle file operations
 class ExcelHandler {
-    public static final String INPUT_FILE_PATH = "src/main/resources/schedule.xlsx";  // Excel file path
 
-    public static Workbook loadWorkbook() throws IOException {
-        FileInputStream fis = new FileInputStream(INPUT_FILE_PATH);
+    public static Workbook loadWorkbook(String filePath) throws IOException {
+        FileInputStream fis = new FileInputStream(filePath);
         return new XSSFWorkbook(fis);
     }
 
-    public static void saveWorkbook(Workbook workbook) throws IOException {
-        FileOutputStream fos = new FileOutputStream(INPUT_FILE_PATH);
+    public static void saveWorkbook(Workbook workbook,String filePath) throws IOException {
+        FileOutputStream fos = new FileOutputStream(filePath);
         workbook.write(fos);
         fos.close();
     }
@@ -99,16 +99,17 @@ class DataWriter {
 // Class to handle GraphQL operations
 public class GraphQLFetcher {
 
-    private static final String URL = "https://amur.mytko.ru/app/graphql";
 
     private final HttpClient client;
+    private final Config config;
     private final ObjectMapper objectMapper;
     private final String authToken;
 
-    public GraphQLFetcher(String authToken) {
+    public GraphQLFetcher(String authToken,Config config) {
         this.client = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
         this.authToken = authToken;
+        this.config = config;
     }
 
     public String sendRequest(String schedule) throws IOException, InterruptedException {
@@ -121,7 +122,7 @@ public class GraphQLFetcher {
         ));
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(URL))
+                .uri(URI.create(config.getURL()))
                 .header("Authorization", "Bearer " + authToken)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(graphqlQuery))
