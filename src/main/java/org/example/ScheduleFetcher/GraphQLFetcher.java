@@ -46,21 +46,23 @@ class ExcelHandler {
     public static String getCellValueAsString(Cell cell) {
         if (cell == null) return "";
 
-        return switch (cell.getCellType()) {
-            case STRING -> ScheduleProcessor.processSchedule(cell.getStringCellValue());
-            case NUMERIC -> {
+        switch (cell.getCellType()) {
+            case STRING:
+                return ScheduleProcessor.processSchedule(cell.getStringCellValue());
+            case NUMERIC:
                 double numericValue = cell.getNumericCellValue();
                 // Проверяем, является ли число целым
                 if (numericValue == (long) numericValue) {
                     String string = String.valueOf((long) numericValue);
-                    yield ScheduleProcessor.processSchedule(string);  // Преобразуем в строку без дробной части
+                    return ScheduleProcessor.processSchedule(string);  // Преобразуем в строку без дробной части
                 } else {
-                    String string = String.valueOf((long) numericValue);
-                    yield ScheduleProcessor.processSchedule(string);// Преобразуем в строку с дробной частью
+                    String string = String.valueOf(numericValue);
+                    return ScheduleProcessor.processSchedule(string);  // Преобразуем в строку с дробной частью
                 }
-            }
-            default -> "";  // Для всех других типов возвращаем пустую строку
-        };
+            default:
+                return "";  // Для всех других типов возвращаем пустую строку
+        }
+
     }
 }
 
