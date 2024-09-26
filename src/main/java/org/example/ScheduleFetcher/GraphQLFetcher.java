@@ -11,13 +11,10 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.example.BearToken.BearTocken.getIdToken;
 
-// Class to handle file operations
 class ExcelHandler {
 
     public static Workbook loadWorkbook(String filePath) throws IOException {
@@ -66,7 +63,6 @@ class ExcelHandler {
     }
 }
 
-// Class to handle writing correct and error data to sheets
 class DataWriter {
 
     public static void writeDataToSheet(Workbook workbook, String lk_code, String schedule, String volume, String amount, boolean isError, String latitude, String longitude) {
@@ -98,7 +94,6 @@ class DataWriter {
     }
 }
 
-// Class to handle GraphQL operations
 public class GraphQLFetcher {
 
 
@@ -141,7 +136,6 @@ public class GraphQLFetcher {
     }
 }
 
-// GraphQL request and variables classes
 class GraphQLRequest {
     public String query;
     public GraphQLVariables variables;

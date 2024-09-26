@@ -46,7 +46,7 @@ public class ExcelFileCreatorWithInput {
         Cell cell7 = row.createCell(6);
         cell7.setCellValue("address");
 
-        // Добавляем еще одну строку с данными
+        // Добавляем тестовую строку с данными
         Row row2 = sheet.createRow(1);
         row2.createCell(0).setCellValue("38113729");
         row2.createCell(1).setCellValue(4);

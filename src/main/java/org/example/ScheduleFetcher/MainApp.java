@@ -5,15 +5,13 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.example.Configuration.Config;
 
-import java.io.File;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
 import static org.example.BearToken.BearTocken.getIdToken;
 
-// Main class to orchestrate the process
 public class MainApp {
 
 
@@ -77,7 +75,7 @@ public class MainApp {
                     String longitude = ExcelHandler.getCellValueAsString(row.getCell(4));// Col C
                     String schedule = ExcelHandler.getCellValueAsString(row.getCell(5)); // Col F
 
-                    // Fetch GraphQL response
+                    // Обработка GraphQL запроса
                     String id = graphQLFetcher.sendRequest(schedule);
 
                     boolean isError = Objects.equals(id, config.getPO_ZAYAVKE()) && !Objects.equals(schedule.toLowerCase(), "по заявке");
@@ -86,7 +84,7 @@ public class MainApp {
 
                 }
 
-                // Save the workbook after processing all rows
+                // Сохраняем в файл.
                 ExcelHandler.saveWorkbook(workbook,filePath);
             }
 
