@@ -49,6 +49,31 @@ ScheduleParserCleanLogistic — это приложение для помощи 
 ## Примечания
 - Убедитесь, что ID графика "По заявке" правильно идентифицирован, чтобы программа корректно отбрасывала неподходящие графики.
 - Для работы с приложением требуется установленная программа Excel.
+## Функция SQL для обновления графиков с учетом нескольких КГ в одной КП у которых уже есть графики
 
-## Лицензия
-Этот проект распространяется на условиях лицензии MIT.
+````
+create function update_schedule(lk_code_ character varying, amount_ double precision, volume_ double precision, schedule_id_ uuid) returns void
+language plpgsql
+as
+$$
+declare
+begin
+    WITH updated_rows AS (
+        SELECT id
+        FROM dsp_container_group
+        WHERE container_area_id = (select id from dsp_container_area where lk_code=lk_code_)
+          AND amount = amount_
+          AND container_type_id = (
+            SELECT id FROM dsp_container_type
+            WHERE volume = volume_
+        )
+          AND schedule_id IS NULL
+        LIMIT 1
+    )
+    UPDATE dsp_container_group
+    SET schedule_id = schedule_id_
+    WHERE id = (SELECT id FROM updated_rows);
+
+end;
+$$;
+````
