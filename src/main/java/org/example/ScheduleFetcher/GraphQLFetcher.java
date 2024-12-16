@@ -164,6 +164,7 @@ class GraphQLVariables {
          // Паттерн для обработки чисел с текстом и других вариантов, например, "Ежедневно"
          // Паттерн для обработки чисел с текстом и других вариантов, например, "Ежедневно"
          Pattern pattern1 = Pattern.compile("(\\d+)\\s*,\\s*(\\d+)\\s+([А-Я]{2})");
+         Pattern pattern2 = Pattern.compile("(\\d+)\\s+([А-Я]{2})");
 
          // Обработка чисел с текстом (например, 1 , 3 СБ)
          Matcher matcher1 = pattern1.matcher(input);
@@ -177,6 +178,24 @@ class GraphQLVariables {
                  StringBuilder result = new StringBuilder();
                  result.append(firstNumber).append("-").append(label).append(",")
                          .append(secondNumber).append("-").append(label);
+
+                 return result.toString();
+             } catch (IllegalStateException e) {
+                 System.err.println("Ошибка: Группа не найдена.");
+                 // Возвращаем оригинальную строку, если возникла ошибка
+                 return input;
+             }
+         }
+
+         Matcher matcher2 = pattern2.matcher(input);
+         if (matcher2.find()) {
+             try {
+                 String firstNumber = matcher2.group(1);  // Извлекаем первое число
+                 String label = matcher2.group(2);        // Извлекаем текст (например, СБ)
+
+                 // Формируем результат
+                 StringBuilder result = new StringBuilder();
+                 result.append(firstNumber).append("-").append(label);
 
                  return result.toString();
              } catch (IllegalStateException e) {
