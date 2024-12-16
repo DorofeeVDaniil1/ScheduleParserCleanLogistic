@@ -158,27 +158,40 @@ class GraphQLVariables {
  class ScheduleProcessor {
 
      public static String processSchedule(String input) {
-         input = replaceDays(input);
-         // Паттерны для обработки чисел с текстом и других вариантов, например, "Ежедневно"
-         Pattern pattern1 = Pattern.compile("\\d+,\\s*\\d+\\s+[А-Я]{2}");
+         input = replaceDays(input.toLowerCase());
+         input = removeSpacesBetweenNumbersAndCommas(input);
+
+         // Паттерн для обработки чисел с текстом и других вариантов, например, "Ежедневно"
+         // Паттерн для обработки чисел с текстом и других вариантов, например, "Ежедневно"
+         Pattern pattern1 = Pattern.compile("(\\d+)\\s*,\\s*(\\d+)\\s+([А-Я]{2})");
 
          // Обработка чисел с текстом (например, 1 , 3 СБ)
          Matcher matcher1 = pattern1.matcher(input);
          if (matcher1.find()) {
-             String label = matcher1.group(3);  // Извлекаем текст (например, СБ)
-             String[] numbers = matcher1.group(0).split("\\s*,\\s*");  // Извлекаем числа
+             try {
+                 String firstNumber = matcher1.group(1);  // Извлекаем первое число
+                 String secondNumber = matcher1.group(2); // Извлекаем второе число
+                 String label = matcher1.group(3);        // Извлекаем текст (например, СБ)
 
-             // Строим результат, добавляя текст к каждому числу
-             StringBuilder result = new StringBuilder();
-             for (String number : numbers) {
-                 result.append(number.split("\\s")[0]).append("-").append(label).append(",");
+                 // Формируем результат
+                 StringBuilder result = new StringBuilder();
+                 result.append(firstNumber).append("-").append(label).append(",")
+                         .append(secondNumber).append("-").append(label);
+
+                 return result.toString();
+             } catch (IllegalStateException e) {
+                 System.err.println("Ошибка: Группа не найдена.");
+                 // Возвращаем оригинальную строку, если возникла ошибка
+                 return input;
              }
-             result.setLength(result.length() - 1);  // Убираем последнюю запятую
-             return result.toString();
          }
 
          return input;
-
+     }
+     public static String removeSpacesBetweenNumbersAndCommas(String input) {
+         // Удаляем пробелы вокруг запятых
+         input = input.replace("\n", "");
+         return input.replaceAll("\\s*,\\s*", ",");
      }
 
      public static String replaceDays(String input) {
@@ -192,7 +205,15 @@ class GraphQLVariables {
                  {"суббота", "СБ"},
                  {"воскресенье", "ВС"},
                  {"Ежедневно","ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС"},
-                 {"ежедневно","ПН,ВТ,СР,ЧТ,ПТ,СБ,ВС"}
+                 {"пн","ПН"},
+                 {"вт","ВТ"},
+                 {"ср","СР"},
+                 {"чт","ЧТ"},
+                 {"пт","ПТ"},
+                 {"сб","СБ"},
+                 {"вс","ВС"},
+                 {"по заявке","По заявке"},
+
          };
 
          // Проходим по каждому дню недели и заменяем его аббревиатурой
@@ -207,5 +228,18 @@ class GraphQLVariables {
          return input;
      }
 
+     public static void main(String[] args) {
+         String input = "3 СБ \n";
 
-}
+         // Вызываем метод processSchedule
+         String processedResult = processSchedule(input);
+         String replace = replaceDays(input);
+
+         // Выводим результат
+         System.out.println(processedResult);
+         System.out.println(replace);
+     }
+
+
+
+ }
