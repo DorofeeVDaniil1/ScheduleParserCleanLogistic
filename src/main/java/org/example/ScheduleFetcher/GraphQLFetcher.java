@@ -1,5 +1,7 @@
 package org.example.ScheduleFetcher;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.*;
@@ -130,7 +132,12 @@ public class GraphQLFetcher {
     }
 
     private String parseResponse(String responseBody) throws IOException {
-        JsonNode rootNode = objectMapper.readTree(responseBody);
+        JsonNode rootNode = null;
+        try {
+            rootNode = objectMapper.readTree(responseBody);
+        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+            throw new RuntimeException(String.valueOf(e));
+        }
         JsonNode dataNode = rootNode.path("data").path("createOrGetFromScheduleNotation");
         return dataNode.path("id").asText();
     }
@@ -166,7 +173,7 @@ class GraphQLVariables {
          Pattern pattern1 = Pattern.compile("(\\d+)\\s*,\\s*(\\d+)\\s+([А-Я]{2})");
          Pattern pattern2 = Pattern.compile("(\\d+)\\s+([А-Я]{2})");
 
-         // Обработка чисел с текстом (например, 1 , 3 СБ)
+         // Обработка чисел с текстом (например, 1, 3 СБ)
          Matcher matcher1 = pattern1.matcher(input);
          if (matcher1.find()) {
              try {
